@@ -79,7 +79,6 @@ if(isset($_POST['imageName'])){
                         <li><a href="index.php#skills">About us</a></li>
                         <li><a href="image.php">Gallery</a></li>
                         <li><a href="album.php">Album</a></li>
-                        <li><a href="dossier.php">Dossier</a></li>
                     </ul>
             </nav>
         </div>

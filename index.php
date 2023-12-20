@@ -25,7 +25,6 @@
                        <li><a href="index.php#skills">About us</a></li>
                        <li><a href="image.php">Gallery</a></li>
                        <li><a href="album.php">Album</a></li>
-                       <li><a href="dossier.php">Dossier</a></li>
                    </ul>
            </nav>
       </div>
@@ -57,12 +56,15 @@
             <div id="my_camera"></div>
             <div id="results" style="visibility: hidden; position: absolute;"></div>
           </div>
-          <!--Affichage du bouton-->
+          <!--Affichage des boutons-->
           <div class="controller">
-              <!--<button id="snap">Capture</button>-->
-              <button id="snap"type="button" onclick="saveSnap();">Capture</button>
+              <button id="snap" type="button" onclick="saveSnap();" style="margin-bottom: -50px;">Capture</button>
           </div>
         </div>
+        <label for="imageInput" style="display: block; width: auto; background: #e3362c; color: #fff; padding: 12px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 1.6rem;" onclick="uploadImage()">Choose an image</label>
+        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        <img id="previewImage" style="max-width: 300px; margin-top: 20px; display: none;">
+        <button onclick="sendToAnalyse()" style="display: block; width: auto; background: #00561b; color: #fff; padding: 12px; border-radius: 5px; cursor: pointer; margin-left: 10px; font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 1.6rem;">Send to Analyse</button>
       </div>
     </div>
   </section>
@@ -296,8 +298,6 @@
            var base64image = document.getElementById("webcam").src;
            Webcam.upload(base64image, 'function.php', function(code,text){
                alert('Save successfully');
-               /*GO TO "image.php" PAGE*/
-               /*document.location.href = "image.php"*/
            });
           
            /*Webcam initializating*/
@@ -309,6 +309,10 @@
             });
 
             Webcam.attach('#my_camera');
+       }
+
+       function sendSnap(){
+
        }
    </script>
 
@@ -325,6 +329,62 @@
           });
       });
   </script>
+
+  <script>
+          var uploadedFileName = null;
+
+          function uploadImage() {
+              var input = document.getElementById('imageInput');
+              var preview = document.getElementById('previewImage');
+
+              var file = input.files[0];
+
+              if (file) {
+                  var reader = new FileReader();
+
+                  reader.onload = function (e) {
+                      preview.src = e.target.result;
+
+                      // Générer un nom d'image basé sur la date et l'heure actuelles
+                      var currentDate = new Date();
+                      var imageName = currentDate.getFullYear() + '.' +
+                                      (currentDate.getMonth() + 1) + '.' +
+                                      currentDate.getDate() + '-' +
+                                      currentDate.getHours() + '.' +
+                                      currentDate.getMinutes() + '.' +
+                                      currentDate.getSeconds() + '.jpeg';
+
+                      uploadedFileName = imageName;
+                  };
+
+                  reader.readAsDataURL(file);
+              } else {
+                  alert('Veuillez sélectionner une image.');
+              }
+          }
+
+          function sendToAnalyse() {
+              if (uploadedFileName) {
+                  var formData = new FormData();
+                  formData.append('file', document.getElementById('imageInput').files[0]);
+
+                  var xhr = new XMLHttpRequest();
+                  xhr.open('POST', 'upload.php', true);
+                  xhr.onreadystatechange = function() {
+                      if (xhr.readyState == 4 && xhr.status == 200) {
+                          alert(xhr.responseText);
+                          // Réinitialiser le champ et l'aperçu
+                          document.getElementById('imageInput').value = '';
+                          document.getElementById('previewImage').style.display = 'none';
+                          uploadedFileName = null;
+                      }
+                  };
+                  xhr.send(formData);
+              } else {
+                  alert('Veuillez d\'abord télécharger une image.');
+              }
+          }
+    </script>
 
 </body>
 
